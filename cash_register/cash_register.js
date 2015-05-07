@@ -24,19 +24,21 @@ $(document).ready(function(){
    $subTotal = $('#subtotal');
 
   myUtils.myEach(line_items, function(v,i){
-    addItem(v.price, v.description);
+    addItem(v.price, v.description.toLowerCase(), v.qty);
   });
+
 
   updateSubTotal();
 
 
 });
 
-function addItem(price, title) {
+function addItem(price, title, quantity) {
   // YUCK! Let's refactor this!
   var html_string = (
         "<tr>" +
           "<td>" +  title + "</td>" +
+          "<td>" + quantity + "</td>" +
           "<td>" + price + "</td>" +
         "</tr>"
   );
@@ -45,6 +47,37 @@ function addItem(price, title) {
 
 function updateSubTotal() {
 // Refactor this using our helper functions :D
-  var subTotalPrice = 0; // !! That won't do! Calculate the actual subtotal.
-  $subTotal.text("$" + price); 
+//(arr, cb, val)
+  var subTotalPrice = myUtils.myReduce(line_items, cb, 0); // !! That won't do! Calculate the actual subtotal.
+  $subTotal.text("$" + subTotalPrice); 
 }
+
+
+
+function cb(val, element) {
+  //need to fix
+  // if(element.qty < 0){
+  //   var contents = $('#refund');
+  // }
+  return val + (element.price * element.qty);
+
+
+}
+
+
+line_items.sort(compare);
+
+function compare(a, b) {
+  if (a.description.toLowerCase() < b.description.toLowerCase() ) {
+    return -1;
+  }
+  if (a.description.toLowerCase() > b.description.toLowerCase()) {
+    return 1;
+  }
+  // a must be equal to b
+  return 0;
+}
+
+
+
+
